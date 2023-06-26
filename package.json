@@ -1,0 +1,21 @@
+{
+  "name": "nodejs-2023-q2-crud-api",
+  "version": "1.0.0",
+  "description": "Simple CRUD API using in-memory database underneath.",
+  "private": true,
+  "main": "/src/index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thirdmadman/nodejs-2023-q2-crud-api.git"
+  },
+  "author": "thirdmadman",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/thirdmadman/nodejs-2023-q2-crud-api/issues"
+  },
+  "homepage": "https://github.com/thirdmadman/nodejs-2023-q2-crud-api#readme"
+}
