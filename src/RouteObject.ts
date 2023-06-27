@@ -1,6 +1,7 @@
-import { IncomingMessage, ServerResponse } from 'http';
+import { ServerResponse } from 'http';
+import { RequestParams } from './RequestParams';
 
 export interface RouteObject {
   route: string;
-  callback: (req: IncomingMessage, resp: ServerResponse) => void;
+  callback: (req: RequestParams, resp: ServerResponse) => void;
 }
