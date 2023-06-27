@@ -1,9 +1,10 @@
 /* eslint-disable class-methods-use-this */
-import { IncomingMessage, ServerResponse } from 'http';
+import { ServerResponse } from 'http';
+import { RequestParams } from './RequestParams';
 
 export class Controller {
-  handleRequest(req: IncomingMessage, resp: ServerResponse) {
-    switch (req.method) {
+  handleRequest(req: RequestParams, resp: ServerResponse) {
+    switch (req.src.method) {
       case 'GET':
         this.onGet(req, resp);
         break;
@@ -22,11 +23,11 @@ export class Controller {
     }
   }
 
-  onGet(req: IncomingMessage, resp: ServerResponse) {}
+  onGet(req: RequestParams, resp: ServerResponse) {}
 
-  onPost(req: IncomingMessage, resp: ServerResponse) {}
+  onPost(req: RequestParams, resp: ServerResponse) {}
 
-  onPut(req: IncomingMessage, resp: ServerResponse) {}
+  onPut(req: RequestParams, resp: ServerResponse) {}
 
-  onDelete(req: IncomingMessage, resp: ServerResponse) {}
+  onDelete(req: RequestParams, resp: ServerResponse) {}
 }
