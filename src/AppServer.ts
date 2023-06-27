@@ -1,24 +1,20 @@
-import { IncomingMessage, createServer, ServerResponse } from 'http';
+import { createServer, ServerResponse } from 'http';
+import { UserController } from './UserController';
 import { Router } from './Router';
+import { RequestParams } from './RequestParams';
 
 const host = 'localhost';
 const port = 8000;
+const API_PREFIX = '/api/';
 
 export class AppServer {
   constructor() {
     const router = new Router();
+    router.setPrefix(API_PREFIX);
 
-    router.addRoute('/books', (req: IncomingMessage, res: ServerResponse) => {
-      res.writeHead(200, { 'Content-Type': 'text/html' });
-      res.writeHead(200);
-      res.end('books');
-    });
+    const userController = new UserController();
 
-    router.addRoute('/authors', (req: IncomingMessage, res: ServerResponse) => {
-      res.writeHead(200, { 'Content-Type': 'text/html' });
-      res.writeHead(200);
-      res.end('authors');
-    });
+    router.addRoute('users', (req: RequestParams, res: ServerResponse) => userController.handleRequest(req, res));
 
     const server = createServer((req, resp) => router.handle(req, resp));
     server.listen(port, host, () => {
