@@ -1,10 +1,18 @@
+/* eslint-disable class-methods-use-this */
 import { IncomingMessage, ServerResponse } from 'http';
+import { RequestParams } from './RequestParams';
 import { RouteObject } from './RouteObject';
 
 export class Router {
   routes: Array<RouteObject> = [];
 
-  addRoute(route: string, callback: (req: IncomingMessage, resp: ServerResponse) => void) {
+  prefix = '';
+
+  setPrefix(prefix: string) {
+    this.prefix = prefix;
+  }
+
+  addRoute(route: string, callback: (req: RequestParams, resp: ServerResponse) => void) {
     this.routes.push({ route, callback } as RouteObject);
   }
 
@@ -12,20 +20,50 @@ export class Router {
     this.routes = this.routes.filter((r) => r.route !== route);
   }
 
+  parseRequestParams(srsReq: IncomingMessage, currentRoute: string) {
+    if (!srsReq || !srsReq?.url) return null;
+
+    const params: RequestParams = {
+      route: currentRoute,
+      pathParam: null,
+      query: null,
+      src: srsReq,
+    };
+
+    const srcString = srsReq.url?.replace(currentRoute, '');
+    if (srcString.length > 0) {
+      const pathParam = srcString.split('?')[0];
+
+      params.pathParam = pathParam.slice(1);
+
+      if (srcString.indexOf('?') > -1) {
+        const queryString = srcString.split('?')[1];
+        params.query = queryString;
+      }
+    }
+
+    return params;
+  }
+
   handle(req: IncomingMessage, res: ServerResponse) {
-    try {
-      if (req.url && this.routes && this.routes.length > 0) {
-        const reqRouteString = req.url.split('?')[0];
-        if (reqRouteString) {
-          const currentRoute = this.routes.find((route) => reqRouteString.indexOf(route.route) === 0);
-          if (currentRoute) {
-            currentRoute.callback(req, res);
-            return;
+    if (req.url) {
+      try {
+        if (req.url && this.routes && this.routes.length > 0) {
+          if (req.url) {
+            const currentRoute = this.routes.find((route) => req.url?.indexOf(`${this.prefix}${route.route}`) === 0);
+            if (currentRoute) {
+              const reqParams = this.parseRequestParams(req, `${this.prefix}${currentRoute.route}`);
+
+              if (!reqParams) return;
+
+              currentRoute.callback(reqParams, res);
+              return;
+            }
           }
         }
+      } catch (e) {
+        console.error(e);
       }
-    } catch (e) {
-      console.error(e);
     }
 
     res.writeHead(404);
