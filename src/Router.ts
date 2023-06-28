@@ -1,10 +1,10 @@
 /* eslint-disable class-methods-use-this */
 import { IncomingMessage, ServerResponse } from 'http';
-import { RequestParams } from './RequestParams';
-import { RouteObject } from './RouteObject';
+import { IRequestParams } from './interfaces/IRequestParams';
+import { IRouteObject } from './interfaces/IRouteObject';
 
 export class Router {
-  routes: Array<RouteObject> = [];
+  routes: Array<IRouteObject> = [];
 
   prefix = '';
 
@@ -12,8 +12,8 @@ export class Router {
     this.prefix = prefix;
   }
 
-  addRoute(route: string, callback: (req: RequestParams, resp: ServerResponse) => void) {
-    this.routes.push({ route, callback } as RouteObject);
+  addRoute(route: string, callback: (req: IRequestParams, resp: ServerResponse) => void) {
+    this.routes.push({ route, callback } as IRouteObject);
   }
 
   removeRoute(route: string) {
@@ -23,7 +23,7 @@ export class Router {
   parseRequestParams(srsReq: IncomingMessage, currentRoute: string) {
     if (!srsReq || !srsReq?.url) return null;
 
-    const params: RequestParams = {
+    const params: IRequestParams = {
       route: currentRoute,
       pathParam: null,
       query: null,
