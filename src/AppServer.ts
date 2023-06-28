@@ -1,7 +1,7 @@
 import { createServer, ServerResponse } from 'http';
-import { UserController } from './UserController';
+import { UserController } from './controllers/UserController';
 import { Router } from './Router';
-import { RequestParams } from './RequestParams';
+import { IRequestParams } from './interfaces/IRequestParams';
 
 import { PORT, HOST, API_PREFIX } from './common/config';
 
@@ -12,7 +12,7 @@ export class AppServer {
 
     const userController = new UserController();
 
-    router.addRoute('users', (req: RequestParams, res: ServerResponse) => userController.handleRequest(req, res));
+    router.addRoute('users', (req: IRequestParams, res: ServerResponse) => userController.handleRequest(req, res));
 
     const server = createServer((req, resp) => router.handle(req, resp));
     server.listen(PORT, Number(HOST), () => {
