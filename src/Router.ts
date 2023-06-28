@@ -63,6 +63,9 @@ export class Router {
         }
       } catch (e) {
         console.error(e);
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: 'Error while handling request' }));
+        return;
       }
     }
 
