@@ -5,9 +5,10 @@
   "private": true,
   "main": "dist/listen.js",
   "scripts": {
-    "start": "node dist/listen",
-    "dev": "cross-env NODE_ENV=development ts-node-dev --no-notify --respawn --transpile-only src/listen.ts",
-    "build": "rm -rf dist && tsc"
+    "prod:build": "rm -rf dist && tsc",
+    "prod:start": "node dist/listen",
+    "start:dev": "cross-env NODE_ENV=development ts-node-dev --no-notify --respawn --transpile-only src/listen.ts",
+    "start:prod": "npm run prod:build && npm run prod:start"
   },
   "repository": {
     "type": "git",
