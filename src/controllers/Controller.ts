@@ -1,9 +1,9 @@
 /* eslint-disable class-methods-use-this */
 import { ServerResponse } from 'http';
-import { RequestParams } from './RequestParams';
+import { IRequestParams } from '../interfaces/IRequestParams';
 
 export class Controller {
-  handleRequest(req: RequestParams, resp: ServerResponse) {
+  handleRequest(req: IRequestParams, resp: ServerResponse) {
     switch (req.src.method) {
       case 'GET':
         this.onGet(req, resp);
@@ -23,11 +23,11 @@ export class Controller {
     }
   }
 
-  onGet(req: RequestParams, resp: ServerResponse) {}
+  onGet(req: IRequestParams, resp: ServerResponse) {}
 
-  onPost(req: RequestParams, resp: ServerResponse) {}
+  onPost(req: IRequestParams, resp: ServerResponse) {}
 
-  onPut(req: RequestParams, resp: ServerResponse) {}
+  onPut(req: IRequestParams, resp: ServerResponse) {}
 
-  onDelete(req: RequestParams, resp: ServerResponse) {}
+  onDelete(req: IRequestParams, resp: ServerResponse) {}
 }
