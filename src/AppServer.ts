@@ -3,9 +3,7 @@ import { UserController } from './UserController';
 import { Router } from './Router';
 import { RequestParams } from './RequestParams';
 
-const host = 'localhost';
-const port = 8000;
-const API_PREFIX = '/api/';
+import { PORT, HOST, API_PREFIX } from './common/config';
 
 export class AppServer {
   constructor() {
@@ -17,9 +15,9 @@ export class AppServer {
     router.addRoute('users', (req: RequestParams, res: ServerResponse) => userController.handleRequest(req, res));
 
     const server = createServer((req, resp) => router.handle(req, resp));
-    server.listen(port, host, () => {
+    server.listen(PORT, Number(HOST), () => {
       // eslint-disable-next-line no-console
-      console.log(`Server is running on http://${host}:${port}`);
+      console.log(`Server is running on http://${HOST}:${PORT}${API_PREFIX}`);
     });
   }
 }
