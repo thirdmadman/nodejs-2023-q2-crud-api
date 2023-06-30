@@ -64,12 +64,12 @@ export class Router {
       } catch (e) {
         console.error(e);
         res.writeHead(500);
-        res.end(JSON.stringify({ error: 'Error while handling request' }));
+        res.end(JSON.stringify({ errors: [{ title: 'Error while handling request' }] }));
         return;
       }
     }
 
     res.writeHead(404);
-    res.end(JSON.stringify({ error: 'Resource not found' }));
+    res.end(JSON.stringify({ errors: [{ title: 'Resource not found' }] }));
   }
 }
