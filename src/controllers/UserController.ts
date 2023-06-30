@@ -9,7 +9,7 @@ import { UserDTO } from '../interfaces/dto/UserDTO';
 export class UserController extends Controller {
   sendError(resp: ServerResponse, code: number, message: string) {
     resp.writeHead(code, { 'Content-Type': 'application/json' });
-    resp.end(JSON.stringify({ error: message }));
+    resp.end(JSON.stringify({ errors: [{ title: message }] }));
   }
 
   getBody(request: IncomingMessage) {
