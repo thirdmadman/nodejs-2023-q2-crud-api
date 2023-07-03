@@ -161,7 +161,7 @@ export class UserController extends Controller {
     }
 
     const respObj = { data };
-    resp.writeHead(200, { 'Content-Type': 'application/json' });
+    resp.writeHead(204, { 'Content-Type': 'application/json' });
     resp.end(JSON.stringify(respObj));
   }
 }
