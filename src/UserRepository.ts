@@ -35,7 +35,7 @@ export class UserRepository {
       }
       return entities;
     }
-    return null;
+    return [];
   }
 
   static updateByUUID(uuid: string, dto: UserDTO) {
