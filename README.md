@@ -4,6 +4,21 @@
 
 Simple CRUD API using in-memory database underneath.
 
+### Build scenarios
+
+Implemented tow build scenarios:
+
+* No bundle - use ```start:prod-no-bundle```, to build app in ```dist``` directory. Uses tsc and its config.
+* Bundle all in one file, to build app in one file in ```build``` directory. Uses webpack and its config.
+
+### About architecture
+
+Used simplified MVC with DTO.
+
+During to shortage of time on development, some concepts may be different/degraded/absent.
+
+By the same reason, DB implementation represented in static object.
+
 ## Usage
 
 1. Clone project
