@@ -7,7 +7,7 @@
   "scripts": {
     "prod:build": "cross-env NODE_ENV=production && rm -rf dist && tsc",
     "prod:bundle": "cross-env NODE_ENV=production && rm -rf build && webpack --mode production --progress",
-    "prod:start-no-bundle": "node dist/listen",
+    "prod:start-no-bundle": "node dist/listen.js",
     "prod:start": "node build/bundle",
     "start:dev": "cross-env NODE_ENV=development ts-node-dev --no-notify --respawn --transpile-only src/listen.ts",
     "start:prod-no-bundle": "npm run prod:build && npm run prod:start-no-bundle",
