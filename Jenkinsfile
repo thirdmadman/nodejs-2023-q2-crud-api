@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    tools {
+      nodejs('NodeJS 22.10.0')
+    }
     options {
         skipStagesAfterUnstable()
     }
@@ -11,10 +14,10 @@ pipeline {
                 }
             }
         }
-        stage('Exec simple script') {
+        stage('Exec simple tests') {
             steps { 
                 script{
-                    sh 'pwd; ls -la; npm i'
+                    sh 'pwd; ls -la; npm i; npm run test'
                 }
             }
         }
