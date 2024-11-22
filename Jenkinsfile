@@ -14,7 +14,7 @@ pipeline {
         stage('Exec simple script') {
             steps { 
                 script{
-                    sh 'pwd; la -l;'
+                    sh 'pwd; ls -la; npm i'
                 }
             }
         }
