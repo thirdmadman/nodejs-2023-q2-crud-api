@@ -12,7 +12,8 @@
     "start:dev": "cross-env NODE_ENV=development ts-node-dev --no-notify --respawn --transpile-only src/listen.ts",
     "start:prod-no-bundle": "npm run prod:build && npm run prod:start-no-bundle",
     "start:prod": "npm run prod:bundle && npm run prod:start",
-    "test": "vitest"
+    "test": "vitest",
+    "test:ci": "vitest --no-color"
   },
   "repository": {
     "type": "git",
