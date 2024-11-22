@@ -17,7 +17,7 @@ pipeline {
         stage('Exec simple tests') {
             steps { 
                 script{
-                    sh 'pwd; ls -la; npm i; npm run test'
+                    sh 'pwd; ls -la; npm i; npm run test:ci'
                 }
             }
         }
