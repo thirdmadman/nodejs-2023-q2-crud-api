@@ -1,26 +1,26 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: crudApi
+  name: crud
 spec:
-  replicas: {{.Values.crudApi.replicaCount}}
+  replicas: {{.Values.crud.replicaCount}}
   selector:
     matchLabels:
-      app: crudApi
+      app: crud
   template:
     metadata:
       labels:
-        app: crudApi
+        app: crud
     spec:
       containers:
-        - name: crudApi
-          image: {{.Values.crudApi.image}}
+        - name: crud
+          image: {{.Values.crud.image}}
           ports:
             - containerPort: 8000
           env:
             - name: PORT
-              value: {{.Values.crudApi.env.API_PORT}}
+              value: {{.Values.crud.env.API_PORT}}
           resources:
             requests:
-              memory: {{.Values.crudApi.resources.requests.memory}}
-              cpu: {{.Values.crudApi.resources.requests.cpu}}
+              memory: {{.Values.crud.resources.requests.memory}}
+              cpu: {{.Values.crud.resources.requests.cpu}}

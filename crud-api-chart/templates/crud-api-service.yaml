@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: crudApi
+  name: crud
 spec:
-  type: {{.Values.crudApi.service.type}}
+  type: {{.Values.crud.service.type}}
   ports:
-    - port: {{.Values.crudApi.service.port}}
+    - port: {{.Values.crud.service.port}}
       targetPort: 8000
-      nodePort: {{.Values.crudApi.service.nodePort}}
+      nodePort: {{.Values.crud.service.nodePort}}
   selector:
-    app: crudApi
+    app: crud
