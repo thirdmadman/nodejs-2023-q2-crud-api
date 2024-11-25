@@ -15,3 +15,7 @@ ENV NODE_ENV=production
 RUN npm prune --production
 RUN chmod 750 /usr/app
 RUN echo "node" > /etc/group && echo "node" > /etc/sudoers
+
+EXPOSE 8080
+
+CMD [ "npm", "run", "prod:start-no-bundle" ]
