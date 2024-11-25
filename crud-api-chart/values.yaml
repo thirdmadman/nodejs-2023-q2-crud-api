@@ -4,7 +4,7 @@ crudApi:
   service:
     type: NodePort
     port: 8000
-    nodePort: 32080
+    nodePort: 32090
   resources:
     requests:
       memory: '128Mi'
