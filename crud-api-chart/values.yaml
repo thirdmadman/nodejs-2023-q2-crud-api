@@ -1,4 +1,4 @@
-crud-api:
+api:
   image: 940482417673.dkr.ecr.eu-north-1.amazonaws.com/thirdmadman/task-6:latest
   replicaCount: 1
   service:
