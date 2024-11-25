@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crud-api
+spec:
+  replicas: {{.Values.crud-api.replicaCount}}
+  selector:
+    matchLabels:
+      app: crud-api
+  template:
+    metadata:
+      labels:
+        app: crud-api
+    spec:
+      containers:
+        - name: crud-api
+          image: {{.Values.crud-api.image}}
+          ports:
+            - containerPort: 8000
+          env:
+            - name: PORT
+              value: {{.Values.crud-api.env.PORT}}
+          resources:
+            requests:
+              memory: {{.Values.crud-api.resources.requests.memory}}
+              cpu: {{.Values.crud-api.resources.requests.cpu}}

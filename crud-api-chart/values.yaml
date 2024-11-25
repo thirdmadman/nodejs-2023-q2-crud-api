@@ -1,0 +1,13 @@
+crud-api:
+  image: 940482417673.dkr.ecr.eu-north-1.amazonaws.com/thirdmadman/task-6:latest
+  replicaCount: 1
+  service:
+    type: NodePort
+    port: 8000
+    nodePort: 32080
+  resources:
+    requests:
+      memory: '128Mi'
+      cpu: '250m'
+  env:
+    PORT: 8000
