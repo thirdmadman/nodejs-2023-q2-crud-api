@@ -4,13 +4,31 @@
 // ]
 
 pipeline {
-  agent any
+  agent {
+    kubernetes {
+     yaml """
+       kind: Pod
+       metadata:
+         name: kaniko
+       spec:
+         containers:
+         - name: jnlp
+           workingDir: /tmp/jenkins
+         - name: kaniko
+           workingDir: /tmp/jenkins
+           image: gcr.io/kaniko-project/executor:debug
+           command:
+           - /busybox/cat
+           tty: true
+"""
+    }
+  }
 
   tools {
-      nodejs('NodeJS 22.10.0')
+    nodejs('NodeJS 22.10.0')
   }
   options {
-      skipStagesAfterUnstable()
+    skipStagesAfterUnstable()
   }
 
   environment {
@@ -22,14 +40,8 @@ pipeline {
     ECR_REGISTRY = """${AWS_USER_ECR}/${IMAGE_REPO_NAME}"""
     ECR_REGISTRY_URI = """http://${ECR_REGISTRY}"""
     CODE_REPO_URL = 'https://github.com/thirdmadman/nodejs-2023-q2-crud-api.git'
-    CODE_REPO_BRANCH = 'master'
+    CODE_REPO_BRANCH = 'task6'
     REGISTRY_CREDENTIAL = 'ecr:eu-north-1:awscred'
-
-    // registryCredential = 'ecr:us-east-1:awscred'
-    // appRegistry = '805619463928.dkr.ecr.us-east-1.amazonaws.com/vprofileappimg'
-    // vprofileRegistry = 'https://805619463928.dkr.ecr.us-east-1.amazonaws.com'
-    // cluster = 'vprofile'
-    // service = 'vprofileappsvc'
   }
 
   stages {
@@ -55,52 +67,20 @@ pipeline {
       }
     }
 
-    // stage('SonarQube Analysis') {
-    //   environment {
-    //     scannerHome = tool 'sonar5.0'
-    //   }
-    //   steps {
-    //     withSonarQubeEnv('sonar') {
-    //       sh ''
-    //       '${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=vprofile \
-    //                -Dsonar.projectName=vprofile-repo \
-    //                -Dsonar.projectVersion=1.0 \
-    //                -Dsonar.sources=src/ \
-    //                -Dsonar.java.binaries=target/test-classes/com/visualpathit/account/controllerTest/ \
-    //                -Dsonar.junit.reportsPath=target/surefire-reports/ \
-    //                -Dsonar.jacoco.reportsPath=target/jacoco.exec \
-    //                -Dsonar.java.checkstyle.reportPaths=target/checkstyle-result.xml'
-    //       ''
-    //     }
-    //   }
-    // }
-
-    // stage('Build App Image') {
-    //   steps {
-    //     script {
-    //       dockerImage = docker.build(ECR_REGISTRY + ":$BUILD_NUMBER", './docker/node.dockerfile')
-    //     }
-    //   }
-    // }
-
-    // stage('Upload App Image') {
-    //   steps {
-    //     script {
-    //       docker.withRegistry(ECR_REGISTRY_URI, REGISTRY_CREDENTIAL) {
-    //         dockerImage.push("$BUILD_NUMBER")
-    //         dockerImage.push('latest')
-    //       }
-    //     }
-    //   }
-    // }
-
-    // stage('Deploy to ECS') {
-    //   steps {
-    //     withAWS(credentials: 'awscred', region: 'us-east-1') {
-    //       sh """aws ecs update-service --cluster ${cluster} --service ${service} --force-new-deployment"""
-    //     }
-    //   }
-    // }
+    stage('Build DockerImage with Kaniko and Push to ECR') {
+      environment {
+        PATH = "/busybox:/kaniko:$PATH"
+      }
+      steps {
+        container(name: 'kaniko', shell: '/busybox/sh') {
+          sh """#!/busybox/sh
+          pwd;
+          echo ${ECR_REGISTRY}:${BUILD_NUMBER};
+          ls -li;
+          /kaniko/executor --context `pwd`/.docker/ --dockerfile `pwd`/.docker/node.dockerfile --destination ${ECR_REGISTRY}:latest"""
+        }
+      }
+    }
   }
 
   // post {
