@@ -19,7 +19,7 @@ spec:
             - containerPort: 8000
           env:
             - name: PORT
-              value: "{{.Values.crud.env.API_PORT}}""
+              value: "{{.Values.crud.env.API_PORT}}"
           resources:
             requests:
               memory: {{.Values.crud.resources.requests.memory}}
