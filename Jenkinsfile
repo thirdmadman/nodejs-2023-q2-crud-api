@@ -79,7 +79,7 @@ spec:
         echo 'Git checkout success'
       }
     }
-    
+
     stage('Run Unit Tests') {
       steps {
         container('nodejs') {
@@ -87,6 +87,7 @@ spec:
               sh 'npm i; npm run test:ci'
             }
         }
+        echo 'Run Unit Tests success'
       }
     }
 
@@ -97,14 +98,16 @@ spec:
               sh 'npm i; npm run prod:build'
             }
           }
+          echo 'Run App Bulild success'
       }
     }
-    
+
     stage('Build DockerImage with Kaniko and Push to ECR') {
       environment {
         PATH = "/busybox:/kaniko:$PATH"
       }
       steps {
+        input 'Do you approve deployment?'
         container(name: 'kaniko', shell: '/busybox/sh') {
           sh """#!/busybox/sh
           pwd;
@@ -112,10 +115,10 @@ spec:
           ls -li;
           /kaniko/executor --context `pwd`/.docker/ --dockerfile `pwd`/.docker/node.dockerfile --destination ${ECR_REGISTRY}:latest"""
         }
+        echo 'Build DockerImage with Kaniko and Push to ECR success'
       }
     }
 
-    
     stage('Get AWC ECR token') {
       steps {
         container(name: 'aws-cli') {
@@ -123,10 +126,10 @@ spec:
               tmp_param = sh (script: """aws ecr get-login-password --region ${AWS_DEFAULT_REGION};""", returnStdout: true).trim()
           }
         }
-        echo 'Recived AWC ECR token'
+        echo 'Get AWC ECR token success'
       }
     }
-    
+
     stage('Add AWS ECR secret via kubectl') {
         steps {
             container('kubectl') {
@@ -134,10 +137,10 @@ spec:
                   sh 'kubectl delete secret my-secret --ignore-not-found;'
                   sh """kubectl create secret docker-registry my-secret --docker-server=${ECR_REGISTRY} --docker-username=AWS --docker-password=${tmp_param}"""
             }
-            echo 'Added AWS ECR secret via kubectl'
+            echo 'Add AWS ECR secret via kubectl success'
         }
     }
-    
+
     stage('Deploy Helm Chart') {
         steps {
             script {
@@ -148,11 +151,11 @@ spec:
                     helm list;
                     """
                 }
-                echo 'Helm chart is deployed'
+                echo 'Deploy Helm Chart success'
             }
         }
     }
-    
+
     stage('Test app is running') {
         steps {
             container(name: 'kubectl') {
