@@ -7,26 +7,54 @@ pipeline {
   agent {
     kubernetes {
      yaml """
-       kind: Pod
-       metadata:
-         name: kaniko
-       spec:
-         containers:
-         - name: jnlp
-           workingDir: /tmp/jenkins
-         - name: kaniko
-           workingDir: /tmp/jenkins
-           image: gcr.io/kaniko-project/executor:debug
-           command:
-           - /busybox/cat
-           tty: true
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kaniko
+spec:
+  containers:
+    - name: jnlp
+      workingDir: /tmp/jenkins
+    - name: kaniko
+      workingDir: /tmp/jenkins
+      image: gcr.io/kaniko-project/executor:debug
+      command:
+        - /busybox/cat
+      tty: true
+    - name: helm
+      image: alpine/helm:latest
+      command:
+        - cat
+      tty: true
+      resources:
+        limit:
+          memory: '64Mi'
+          cpu: '100m'
+    - name: aws-cli
+      image: amazon/aws-cli:latest
+      command: ['/bin/sh', '-c', 'while true; do sleep 30; done;']
+      tty: true
+      resources:
+        limit:
+          memory: '64Mi'
+          cpu: '100m'
+    - name: kubectl
+      image: docker.io/bitnami/kubectl
+      command:
+        - cat
+      tty: true
+      securityContext:
+        runAsUser: 1000
+    - name: nodejs
+      image: node:alpine
+      command:
+        - cat
+      tty: true
+
 """
     }
   }
 
-  tools {
-    nodejs('NodeJS 22.10.0')
-  }
   options {
     skipStagesAfterUnstable()
   }
@@ -48,25 +76,30 @@ pipeline {
     stage('Fetch Code') {
       steps {
         git branch: CODE_REPO_BRANCH, url: CODE_REPO_URL
+        echo 'Git checkout success'
       }
     }
-
+    
     stage('Run Unit Tests') {
       steps {
-        script {
-          sh 'npm i; npm run test:ci'
+        container('nodejs') {
+            script {
+              sh 'npm i; npm run test:ci'
+            }
         }
       }
     }
 
     stage('Run App Bulild') {
       steps {
-        script {
-          sh 'npm i; npm run prod:build'
-        }
+          container('nodejs') {
+            script {
+              sh 'npm i; npm run prod:build'
+            }
+          }
       }
     }
-
+    
     stage('Build DockerImage with Kaniko and Push to ECR') {
       environment {
         PATH = "/busybox:/kaniko:$PATH"
@@ -80,6 +113,64 @@ pipeline {
           /kaniko/executor --context `pwd`/.docker/ --dockerfile `pwd`/.docker/node.dockerfile --destination ${ECR_REGISTRY}:latest"""
         }
       }
+    }
+
+    
+    stage('Get AWC ECR token') {
+      steps {
+        container(name: 'aws-cli') {
+          script {
+              tmp_param = sh (script: """aws ecr get-login-password --region ${AWS_DEFAULT_REGION};""", returnStdout: true).trim()
+          }
+        }
+        echo 'Recived AWC ECR token'
+      }
+    }
+    
+    stage('Add AWS ECR secret via kubectl') {
+        steps {
+            container('kubectl') {
+                  sh 'kubectl get pods -o wide --all-namespaces'
+                  sh 'kubectl delete secret my-secret --ignore-not-found;'
+                  sh """kubectl create secret docker-registry my-secret --docker-server=${ECR_REGISTRY} --docker-username=AWS --docker-password=${tmp_param}"""
+            }
+            echo 'Added AWS ECR secret via kubectl'
+        }
+    }
+    
+    stage('Deploy Helm Chart') {
+        steps {
+            script {
+                container(name: 'helm') {
+                    sh """
+                    helm list;
+                    helm upgrade --install my-crud-api-release ./crud-api-chart/;
+                    helm list;
+                    """
+                }
+                echo 'Helm chart is deployed'
+            }
+        }
+    }
+    
+    stage('Test app is running') {
+        steps {
+            container(name: 'kubectl') {
+              script {
+                  clusterIP = sh (script: """kubectl get svc crud -n jenkins -o jsonpath='{.spec.clusterIP}'""", returnStdout: true).trim()
+                  appPort = sh (script: """kubectl get svc crud -n jenkins -o jsonpath='{.spec.ports[].port}'""", returnStdout: true).trim()
+              }
+            }
+            script {
+                appRootRoute = sh (script: """curl -s ${clusterIP}:${appPort}/api/""", returnStdout: true).trim()
+                appUsersRoute = sh (script: """curl -s ${clusterIP}:${appPort}/api/users""", returnStdout: true).trim()
+                if (appRootRoute == '{"errors":[{"title":"Resource not found"}]}' && appUsersRoute == '{"data":[]}') {
+                    echo 'All good, CRUD API responding'
+                } else {
+                    echo 'Test CRUD API FAILED, response results unmatch'
+                }
+            }
+        }
     }
   }
 
