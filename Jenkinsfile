@@ -214,9 +214,6 @@ spec:
   }
 
   post {
-    always {
-      deleteDir()
-    }
     success {
       echo 'All good, Build successful'
       sendNotification("All good, Build successful")
