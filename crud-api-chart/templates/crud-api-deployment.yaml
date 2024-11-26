@@ -12,6 +12,10 @@ spec:
       labels:
         app: crud
     spec:
+      imagePullSecrets:
+        {{- range .Values.imagePullSecrets }}
+        - name: {{ .name }}
+        {{- end }}
       containers:
         - name: crud
           image: {{.Values.crud.image}}

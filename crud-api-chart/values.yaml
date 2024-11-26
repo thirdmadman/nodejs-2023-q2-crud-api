@@ -11,3 +11,7 @@ crud:
       cpu: '250m'
   env:
     API_PORT: 8000
+imagePullSecrets:
+  - name: my-secret
+
+namespace: jenkins
