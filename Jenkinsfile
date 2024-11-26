@@ -1,7 +1,7 @@
 def sendNotification(message) {
     if (env.TELEGRAM_BOT_TOKEN && env.TELEGRAM_CHAT_ID) {
         sh """
-        curl -X POST \
+        curl -s -X POST \
          -H 'Content-Type: application/json' \
          -d '{"chat_id": "${env.TELEGRAM_CHAT_ID}", "text": "\
 Running on node: ${env.NODE_NAME}\n\
@@ -90,6 +90,9 @@ spec:
       steps {
         git branch: CODE_REPO_BRANCH, url: CODE_REPO_URL
         echo 'Git checkout success'
+        script {
+            sendNotification("""Starting pipeline, commit to run: ${env.GIT_COMMIT}""")
+        }
       }
     }
 
