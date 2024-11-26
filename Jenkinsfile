@@ -1,7 +1,18 @@
-// def String COLOR_MAP = [
-//   'SUCCESS': 'good',
-//   'FAILURE': 'danger',
-// ]
+def sendNotification(message) {
+    if (env.TELEGRAM_BOT_TOKEN && env.TELEGRAM_CHAT_ID) {
+        sh """
+        curl -X POST \
+         -H 'Content-Type: application/json' \
+         -d '{"chat_id": "${env.TELEGRAM_CHAT_ID}", "text": "\
+Running on node: ${env.NODE_NAME}\n\
+Job name: ${env.JOB_NAME}\n\
+Build number: ${env.BUILD_NUMBER}\n\
+Message:\n\
+${message}", "disable_notification": true}' \
+         https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage
+        """
+    }
+}
 
 pipeline {
   agent {
@@ -60,6 +71,8 @@ spec:
   }
 
   environment {
+    TELEGRAM_BOT_TOKEN = credentials('TELEGRAM_BOT_TOKEN')
+    TELEGRAM_CHAT_ID = credentials('TELEGRAM_CHAT_ID')
     AWS_ACCOUNT_ID = '940482417673'
     AWS_DEFAULT_REGION = 'eu-north-1'
     IMAGE_REPO_NAME = 'thirdmadman/task-6'
@@ -88,6 +101,9 @@ spec:
             }
         }
         echo 'Run Unit Tests success'
+        script {
+            sendNotification("Run Unit Tests success")
+        }
       }
     }
 
@@ -99,6 +115,9 @@ spec:
             }
           }
           echo 'Run App Bulild success'
+          script {
+            sendNotification("Run App Bulild success")
+          }
       }
     }
 
@@ -116,6 +135,9 @@ spec:
           /kaniko/executor --context `pwd`/.docker/ --dockerfile `pwd`/.docker/node.dockerfile --destination ${ECR_REGISTRY}:latest"""
         }
         echo 'Build DockerImage with Kaniko and Push to ECR success'
+        script {
+          sendNotification("Build DockerImage with Kaniko and Push to ECR success")
+        }
       }
     }
 
@@ -127,6 +149,9 @@ spec:
           }
         }
         echo 'Get AWC ECR token success'
+        script {
+          sendNotification("Get AWC ECR token success")
+        }
       }
     }
 
@@ -138,6 +163,9 @@ spec:
                   sh """kubectl create secret docker-registry my-secret --docker-server=${ECR_REGISTRY} --docker-username=AWS --docker-password=${tmp_param}"""
             }
             echo 'Add AWS ECR secret via kubectl success'
+            script {
+              sendNotification("Add AWS ECR secret via kubectl success")
+            }
         }
     }
 
@@ -152,6 +180,9 @@ spec:
                     """
                 }
                 echo 'Deploy Helm Chart success'
+            }
+            script {
+              sendNotification("Deploy Helm Chart success")
             }
         }
     }
@@ -169,20 +200,27 @@ spec:
                 appUsersRoute = sh (script: """curl -s ${clusterIP}:${appPort}/api/users""", returnStdout: true).trim()
                 if (appRootRoute == '{"errors":[{"title":"Resource not found"}]}' && appUsersRoute == '{"data":[]}') {
                     echo 'All good, CRUD API responding'
+                    sendNotification("All good, CRUD API responding")
                 } else {
                     echo 'Test CRUD API FAILED, response results unmatch'
+                    sendNotification("Test CRUD API FAILED, response results unmatch")
                 }
             }
         }
     }
   }
 
-  // post {
-  //   always {
-  //     echo 'Slack Notifications.'
-  //     slackSend channel: '#jenkinscicd',
-  //       color: COLOR_MAP[currentBuild.currentResult],
-  //       message: """*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} \n More info at: ${env.BUILD_URL}"""
-  //   }
-  // }
+  post {
+    always {
+      deleteDir()
+    }
+    success {
+      echo 'All good, Build successful'
+      sendNotification("All good, Build successful")
+    }
+    failure {
+      echo 'Build failed'
+      sendNotification("Build failed")
+    }
+  }
 }
