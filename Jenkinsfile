@@ -126,6 +126,9 @@ spec:
         PATH = "/busybox:/kaniko:$PATH"
       }
       steps {
+        script {
+          sendNotification("Manual Deployment in jenkins: (Do you approve deployment?)")
+        }
         input 'Do you approve deployment?'
         container(name: 'kaniko', shell: '/busybox/sh') {
           sh """#!/busybox/sh
