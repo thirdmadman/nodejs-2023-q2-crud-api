@@ -202,6 +202,7 @@ spec:
               }
             }
             script {
+                sleep(60)
                 appRootRoute = sh (script: """curl -s ${clusterIP}:${appPort}/api/""", returnStdout: true).trim()
                 appUsersRoute = sh (script: """curl -s ${clusterIP}:${appPort}/api/users""", returnStdout: true).trim()
                 if (appRootRoute == '{"errors":[{"title":"Resource not found"}]}' && appUsersRoute == '{"data":[]}') {
