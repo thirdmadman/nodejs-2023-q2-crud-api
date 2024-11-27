@@ -218,12 +218,16 @@ spec:
 
   post {
     success {
-      echo 'All good, Build successful'
-      sendNotification("All good, Build successful")
+      script {
+        echo 'All good, Build successful'
+        sendNotification("All good, Build successful")
+      }
     }
     failure {
-      echo 'Build failed'
-      sendNotification("Build failed")
+      script {
+        echo 'Build failed'
+        sendNotification("Build failed")
+      }
     }
   }
 }
