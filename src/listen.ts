@@ -1,3 +1,3 @@
 import { AppServer } from './AppServer';
 
-const appServer = new AppServer();
+export const appServer = new AppServer();

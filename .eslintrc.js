@@ -22,6 +22,7 @@ module.exports = {
     'object-curly-newline': ['error', { consistent: true }],
     'prettier/prettier': ['error', { endOfLine: 'auto' }],
     'import/prefer-default-export': 'off',
+    "import/no-extraneous-dependencies": 'off',
     '@typescript-eslint/no-explicit-any': 'error',
     'no-plusplus': [2, { allowForLoopAfterthoughts: true }],
     'no-console': ['error', { allow: ['warn', 'error'] }],

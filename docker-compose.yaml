@@ -1,0 +1,27 @@
+version: '3.1'
+
+services:
+
+  web:
+    container_name: nodejs2023Q2-service-app
+    image: thirdmadman/nodejs2023q2-service-app
+    env_file: .env
+    environment:
+      - DATABASE_URL=${DATABASE_URL_DOCKER}
+    build: 
+      dockerfile: ./.docker/node.dockerfile
+    command:
+      - /bin/sh
+      - -c
+      - |
+        npm run prod:start-no-bundle
+    volumes:
+      - app-dist:/usr/app/dist/
+      - node_modules:/usr/app/node_modules
+    ports:
+      - "${PORT}:${PORT}"
+    restart: always
+
+volumes:
+  app-dist:
+  node_modules:
