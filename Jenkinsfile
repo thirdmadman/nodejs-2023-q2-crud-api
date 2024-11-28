@@ -80,15 +80,15 @@ spec:
     AWS_USER_ECR = """${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"""
     ECR_REGISTRY = """${AWS_USER_ECR}/${IMAGE_REPO_NAME}"""
     ECR_REGISTRY_URI = """http://${ECR_REGISTRY}"""
-    CODE_REPO_URL = 'https://github.com/thirdmadman/nodejs-2023-q2-crud-api.git'
-    CODE_REPO_BRANCH = 'task6'
-    REGISTRY_CREDENTIAL = 'ecr:eu-north-1:awscred'
+    // CODE_REPO_URL = 'https://github.com/thirdmadman/nodejs-2023-q2-crud-api.git'
+    // CODE_REPO_BRANCH = 'task6'
   }
 
   stages {
     stage('Fetch Code') {
       steps {
-        git branch: CODE_REPO_BRANCH, url: CODE_REPO_URL
+        checkout scm
+        // git branch: CODE_REPO_BRANCH, url: CODE_REPO_URL
         echo 'Git checkout success'
         script {
             sendNotification("""Starting pipeline, commit to run: ${env.GIT_COMMIT}""")
